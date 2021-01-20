@@ -112,7 +112,7 @@ Following instructions provide various methods on how to program Linux kernel an
         Partition Map for MMC device 0  --   Partition Type: DOS
 
         Part	Start Sector	Num Sectors	UUID		Type
-          1	2048      	131072    	9684eaa1-01	83    <--- This partition is used for Linux kernel
+          11	2048      	131072    	9684eaa1-01	83    <--- This partition is used for Linux kernel
           2	133120    	60938240  	9684eaa1-02	83    <--- And next partition for Root File-system 
 
 
@@ -128,7 +128,7 @@ Following instructions provide various methods on how to program Linux kernel an
         ZynqMP> mmc write 0x1000000 0x800 0x20000
         MMC write: dev # 0, block # 2048, count 131072 ... 131072 blocks written: OK
 
-    *  0x800 = 2048 (decimal) is starting sector of Partition-1   
+    *  0x800 = 2048 (decimal) is first sector of this Partition
     *  0x20000 = 131072 (decimal) which is Total size of kernel in bytes / sector size = (67108864 / 512) = 131072   
     *  0x1000000 = memory address where kernel.img was copied using TFTP  
 
@@ -145,10 +145,11 @@ Following instructions provide various methods on how to program Linux kernel an
         ZynqMP> mmc write 0x2000000 0x20800 0xfa000
         MMC write: dev # 0, block # 133120, count 1024000 ... 1024000 blocks written: OK
 
-    *  Partition 2 is ~29G in size, so to save time you may erase on which is required. In this example, 2GB is erased      
-    *  0x20800 = 133130 (decimal) is starting sector of Partition-2
-    *  0x400000 = 4194304 (decimal) which is Total size of kernel in bytes / sector size = (2 x 1024 x 1024 x 1024 / 512) = 4194304
+    *  Partition 2 is ~29G in size, so to save time you may erase only the space which is required. For example we erase only 2GB in above command      
+    *  0x20800 = 133130 (decimal) is first sector of this Partition
+    *  0x400000 = (size of partition in bytes) / (sector size) = (2 x 1024 x 1024 x 1024 / 512) = 4194304 (decimal) = 0x400000
     *  0x2000000 = memory address where root.img was copied using TFTP    
+    *  0xfa000 = (size of the RootFS image) / (sector size) = (1024000 / 512) = 1024000 (decimal) = 0xfa000
 
 
 4. Update bootargs variable to select eMMC as Root device.   
