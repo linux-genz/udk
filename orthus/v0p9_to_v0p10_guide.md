@@ -13,6 +13,20 @@ Autoboot is currently not working with the current configuration in Petalinux 20
 
 These 3 commands instructs U-Boot to read the kernel file on the mmc (image.ub), set the bootargs for the console, the rootfs location, and other settings, and then boot the kernel.
 
+If the eMMC on the 250-Soc has not been partitioned in such a way, you can partition it with the following commands:
+
+    root@udk:~# fdisk /dev/mmcblk0
+    t,1,c   (set the type of partition 1 to 32bit FAT)
+    root@udk:~# apt install dosfstools
+    root@udk:~# mkfs.vfat -F 32 -n boot /dev/mmcblk0p1
+    root@udk:~# mount /dev/mmcblk0p1 /boot
+    
+    (reboot)
+    
+    ZynqMP> fatls mmc 0:1
+    
+      7299528   image.ub
+
 #### genz.conf changes
 
 The file at /etc/modprobe.d/genz.conf has changed from what is included in the rootfs v1.2. Please replace its content with the following:
@@ -27,6 +41,10 @@ The file at /etc/modprobe.d/genz.conf has changed from what is included in the r
     options genz-blk dyndbg="+pflm; func genz_blk_sgl_cmpl =_"
     options orthus  dyndbg="+pflm; func orthus_local_control_read =_; func orthus_control_offset_to_base =_; func orthus_sgl_request =_"
 
+#### New module for 5.4.0 kernel
+
+In addition, because we are now on the 5.4.0 kernel, the lib/modules/4.19.0/ directory on the rootfs needs to be replaced with lib/modules/5.4.0
+The contents come from the rootfs created by Petalinux, and it is uploaded at orthus_images/v0p10-linux5p4-modules.tar.gz
 
 #### New Kernel Config Options 
 
@@ -52,12 +70,13 @@ If you are building your own kernel, make sure you have the following options se
     Search for USB and USB_PCI and disable both [250-SOC has no USB]
     Search for BT and disable [250-SOC has no Bluetooth]
     Search for CPU_IDLE and disable [workaround for Vivado HW-mgr hangs CPUs]
-    Search for MEMORY_HOTADD and MEMORY_HOTREMOVE and enable both
+    Search for MEMORY_HOTPLUG and MEMORY_HOTREMOVE and enable both
+    Search for SPARSEMEM_VMEMMAP and enable
     Search for ZONE_DEVICE and enable
     Search for FS_DAX and enable
 
 
 #### Other notes
 
-The genz.ko and genz-blk.ko modules need to be updated as well to work with the new orthus.ko. The updated modules can be found in v0p10_images.tar.gz or can be built from Github source. Note that because of the change in kernel versions, the new genz-linux branch is genz-xlnx_rebase_v5.4.
+The genz.ko and genz-blk.ko modules need to be updated as well to work with the new orthus.ko. The updated modules can be found in v0p10-images.tar.gz or can be built from Github source. Note that because of the change in kernel versions, the new genz-linux branch is genz-xlnx_rebase_v5.4.
 
