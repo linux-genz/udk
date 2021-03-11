@@ -44,7 +44,8 @@ The file at /etc/modprobe.d/genz.conf has changed from what is included in the r
 #### New module for 5.4.0 kernel
 
 In addition, because we are now on the 5.4.0 kernel, the lib/modules/4.19.0/ directory on the rootfs needs to be replaced with lib/modules/5.4.0
-The contents come from the rootfs created by Petalinux, and it is uploaded at orthus_images/v0p10-linux5p4-modules.tar.gz
+The contents come from the rootfs created by Petalinux, and it is uploaded at orthus_images/v0p10-linux5p4-modules.tar.gz.
+*Please note that the genz & orthus modules in this tar will need to be replaced by the modules provided in orthus image tar*
 
 #### New Kernel Config Options 
 
