@@ -81,3 +81,9 @@ If you are building your own kernel, make sure you have the following options se
 
 The genz.ko and genz-blk.ko modules need to be updated as well to work with the new orthus.ko. The updated modules can be found in v0p10-images.tar.gz or can be built from Github source. Note that because of the change in kernel versions, the new genz-linux branch is genz-xlnx_rebase_v5.4.
 
+To run Zephyr, the correct CUUID:Serial values for the producer (ZMM) and consumer (Bridge) have to be populated in zephyr-fabric.conf. Instructions to do so is in zerphyr-fm/example-zephyr-fabric.conf
+
+Llamas requires alpaka at https://github.com/linux-genz/python3-alpaka, which I installed with the following command:
+
+	python3 -m pip install git+https://github.com/linux-genz/python3-alpaka.git@v0.1
+
