@@ -79,8 +79,6 @@ If you are building your own kernel, make sure you have the following options se
     Search for FS_DAX and enable
 
 
-
-
 #### Zephyr Setup
 
 To run Zephyr, the correct CUUID:Serial values for the producer (ZMM) and consumer (Bridge) have to be populated in zephyr-fabric.conf. Please edit the file at zerphyr-fm/example-zephyr-fabric.conf and populate the fields.
@@ -94,7 +92,6 @@ To find the CUUID:SerialNum, first run zephyr. Then run lsgenz in a separate win
 #### Llamas Setup
 
 Setup llamas by running the setup.py: "python3 setup.py install"
-
 There might be some missing dependencies such as libnl and networkx, in addition to alpaka.
 
 Llamas requires alpaka at https://github.com/linux-genz/python3-alpaka, which I installed with the following command:
@@ -105,7 +102,7 @@ After setup.py runs successfully, you can run llamas with: "python3 llamas -vvvv
 
 #### Seeing ZMM as block device
 First run Zephyr in one window, and then run LLaMaS in a new window.
-You should see this in the zephyr window:
+You should see this in the zephyr window
     DEBUG | - Sending {[many fields]} to http://localhost:1991/api/v1/device/add
 And the following in llamas:
     INFO | - Sending netlink PID=1108; cmd=GENZ_C_ADD_COMPONENT
