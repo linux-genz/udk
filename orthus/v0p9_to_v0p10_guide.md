@@ -102,10 +102,14 @@ After setup.py runs successfully, you can run llamas with: "python3 llamas -vvvv
 
 #### Seeing ZMM as block device
 First run Zephyr in one window, and then run LLaMaS in a new window.
-You should see this in the zephyr window
+You should see this in the zephyr window:
+
     DEBUG | - Sending {[many fields]} to http://localhost:1991/api/v1/device/add
+    
 And the following in llamas:
+
     INFO | - Sending netlink PID=1108; cmd=GENZ_C_ADD_COMPONENT
+    
 At this point, you should be able to see the ZMM as a block device.
 
 
