@@ -41,11 +41,13 @@ The file at /etc/modprobe.d/genz.conf has changed from what is included in the r
     options genz-blk dyndbg="+pflm; func genz_blk_sgl_cmpl =_"
     options orthus  dyndbg="+pflm; func orthus_local_control_read =_; func orthus_control_offset_to_base =_; func orthus_sgl_request =_"
 
-#### New module for 5.4.0 kernel
+#### New modules for 5.4.0 kernel
 
 In addition, because we are now on the 5.4.0 kernel, the lib/modules/4.19.0/ directory on the rootfs needs to be replaced with lib/modules/5.4.0
 The contents come from the rootfs created by Petalinux, and it is uploaded at orthus_images/v0p10-linux5p4-modules.tar.gz.
 *Please note that the genz & orthus modules in this tar will need to be replaced by the modules provided in orthus image tar*
+
+The genz.ko and genz-blk.ko modules need to be updated as well to work with the new orthus.ko. The updated modules can be found in v0p10-images.tar.gz or can be built from Github source. Note that because of the change in kernel versions, the new genz-linux branch is genz-xlnx_rebase_v5.4.
 
 #### New Kernel Config Options 
 
@@ -77,13 +79,37 @@ If you are building your own kernel, make sure you have the following options se
     Search for FS_DAX and enable
 
 
-#### Other notes
 
-The genz.ko and genz-blk.ko modules need to be updated as well to work with the new orthus.ko. The updated modules can be found in v0p10-images.tar.gz or can be built from Github source. Note that because of the change in kernel versions, the new genz-linux branch is genz-xlnx_rebase_v5.4.
 
-To run Zephyr, the correct CUUID:Serial values for the producer (ZMM) and consumer (Bridge) have to be populated in zephyr-fabric.conf. Instructions to do so is in zerphyr-fm/example-zephyr-fabric.conf
+#### Zephyr Setup
+
+To run Zephyr, the correct CUUID:Serial values for the producer (ZMM) and consumer (Bridge) have to be populated in zephyr-fabric.conf. Please edit the file at zerphyr-fm/example-zephyr-fabric.conf and populate the fields.
+
+To find the CUUID:SerialNum, first run zephyr. Then run lsgenz in a separate window:
+
+    udk@250-SoC:~/lsgz$ ./lsgenz
+    1:0000:001 bridge0 e3331770-6648-4def-8100-404d844298d3:0x013a4a851c810045
+    1:0000:002 memory 859be62c-b435-49fe-bf18-c2ac4a50f9c4:0x013a25e54c61e285
+    
+#### Llamas Setup
+
+Setup llamas by running the setup.py: "python3 setup.py install"
+
+There might be some missing dependencies such as libnl and networkx, in addition to alpaka.
 
 Llamas requires alpaka at https://github.com/linux-genz/python3-alpaka, which I installed with the following command:
 
-	python3 -m pip install git+https://github.com/linux-genz/python3-alpaka.git@v0.1
+    python3 -m pip install git+https://github.com/linux-genz/python3-alpaka.git@v0.1
+
+After setup.py runs successfully, you can run llamas with: "python3 llamas -vvvvv". 
+
+#### Seeing ZMM as block device
+First run Zephyr in one window, and then run LLaMaS in a new window.
+You should see this in the zephyr window:
+    DEBUG | - Sending {[many fields]} to http://localhost:1991/api/v1/device/add
+And the following in llamas:
+    INFO | - Sending netlink PID=1108; cmd=GENZ_C_ADD_COMPONENT
+At this point, you should be able to see the ZMM as a block device.
+
+
 
