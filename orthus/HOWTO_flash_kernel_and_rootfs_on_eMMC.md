@@ -4,21 +4,20 @@ Following instructions provide various methods on how to program Linux kernel an
 
 ---
 
-### Using TFTP  
+### Setting up TFTP server
 
-#### Setup instructions  
-
+#### TFTP Server on Host machine   
 1. Setup TFTP server to any external host which is accessible through wired network   
 	* Refer [How to setup TFTP on Ubuntu ?](https://linuxhint.com/install_tftp_server_ubuntu/)   
 	* Use TFTP_ADDRESS="IP_ADDRESS_OF_THIS_SERVER:PORT_NUMBER"   
 	* Use TFTP_OPTIONS="--secure --create"   
 
 2. Once tftp server is running on host, copy kernel and root file-system binaries to the tftp root directory   
-	* NOTE: Remember to change the ownership of files using LINUX> chown tftp:tftp  image.ub rootfs.img   
+	**Remember to change the ownership of files like kernel.img rootfs.img using following command**
+	LINUX> chown tftp:tftp  image.ub rootfs.img   
 
-3. Connect Orthus card to existing network, though RJ45 on Ethernet daughter card mounted along the full-height bracket   
-
-4. Serial console configurations for Orthus card
+#### TFTP Client on Orthus Card    
+1. Serial console configurations for Orthus card  
 
         Serial device= /dev/ttyUSB0   
         Baud = 115200 8N1   
@@ -26,8 +25,9 @@ Following instructions provide various methods on how to program Linux kernel an
         Software flow control = No   
 
 
-#### Programing Instructions  
-1. On Othus card, configure TFTP host server's IP, gateway and static address. an available ip address for the Orthus card with the following variables   
+2. Connect Orthus card to same LAN network as TFTP Server above, using RJ45 connector mounted on Ethernet daughter card along full-height bracket   
+
+3. Using serial console, configure following variables on Orthus card  
 
         ZynqMP> setenv serverip 10.0.31.150  // This is $TFTP_ADDRESS as configured on TFTP host server   
         ZynqMP> setenv gateway 10.0.31.1     // This is IP address of your local lab or home network. If there is no gateway then you can set it same as $TFTP_ADDRESS   
@@ -35,19 +35,23 @@ Following instructions provide various methods on how to program Linux kernel an
 
    *  U-Boot also supports DHCP, please look into the dhcp tool on U-Boot for more details.   
 
-2. if link is up, then ping should work like below   
+4. Verify if Orthus card can ping TFTP Server   
 
-        ZynqMP> ping 10.0.31.150
+        ZynqMP> ping $serverip
         Using ethernet@ff0c0000 device
         host 10.0.31.150 is alive
 
-3. Save these settings for future reuse   
+5. Save these settings for future reuse   
         ZynqMP> saveenv
 
 
-4. Fetch kernel.img from TFTP server to kit memory at address 0x1000000 note down the addresses and # of bytes received printed at end of command   
+### Program Linux kernel to eMMC on Orthus card   
 
-        ZynqMP> tftpboot 0x1000000 kernel.img
+1. Fetch kernel.img from TFTP server to kit memory at address 0x1000000 note down the addresses and # of bytes received printed at end of command   
+
+        ZynqMP> mw.b 0x1000000 0x0 0x4000000           <--- clear the memory segment where kernel.img will be copied
+
+	ZynqMP> tftpboot 0x1000000 kernel.img
         Using ethernet@ff0c0000 device
         TFTP from server 10.0.31.150; our IP address is 10.0.31.147
         Filename 'kernel.img'.
@@ -63,28 +67,7 @@ Following instructions provide various methods on how to program Linux kernel an
         Bytes transferred = 67108864 (4000000 hex)    <--- ** Total size of kernel image in bytes (NOTE this)**
 
 
-5. Copy Root File-system image from TFTP   
-
-        ZynqMP> tftpboot 0x2000000 rootfs.img
-        Using ethernet@ff0c0000 device
-        TFTP from server 10.0.31.150; our IP address is 10.0.31.147
-        Filename 'rootfs.img'.
-        Load address: 0x2000000                      <--- ** Location in memory where rootfs.img is copied (Note this)**
-        Loading: #################################################################
-                 #################################################################
-                 #################################################################
-                 #################################################################
-                 ...
-                 ######################
-                 5.3 MiB/s
-        done
-        Bytes transferred = 524288000 (1f400000 hex) <--- ** Total size of Root file-system image in Bytes (Note this) **
-
----
-
-### Flashing kernel and RootFS image to eMMC
-
-1. Identify partitions on the eMMC device.   
+2. Identify partitions on the eMMC   
 
         ZynqMP> mmc info
         Device: mmc@ff160000
@@ -116,7 +99,7 @@ Following instructions provide various methods on how to program Linux kernel an
           2	133120    	60938240  	9684eaa1-02	83    <--- And next partition for Root File-system 
 
 
-2. Erase partition 1 and flash kernel from memory address 0x1000000 to MMC   
+3. Erase partition 1 and flash kernel from memory address 0x1000000 to MMC   
 
         ZynqMP> mmc dev 0  
         switch to partitions #0, OK
@@ -129,11 +112,37 @@ Following instructions provide various methods on how to program Linux kernel an
         MMC write: dev # 0, block # 2048, count 131072 ... 131072 blocks written: OK
 
     *  0x800 = 2048 (decimal) is first sector of this Partition
-    *  0x20000 = 131072 (decimal) which is Total size of kernel in bytes / sector size = (67108864 / 512) = 131072   
+    *  0x20000 = 131072 (decimal) which is Total size of kernel in bytes / sector size = (67108864 / 512) = 131072 (decimal)  
     *  0x1000000 = memory address where kernel.img was copied using TFTP  
 
 
-3. Erase partition 2 and flash rootfs from memory address 0x2000000 to MMC,
+
+---
+---
+
+### Program Root File-System image to eMMC on Orthus Card   
+
+
+1. Fetch Root File-system image from TFTP   
+
+        ZynqMP> mw.b 0x1000000 0x0 0x20000000          <--- clear the memory segment where rootfs.img will be copied
+        ZynqMP> tftpboot 0x2000000 rootfs.img
+        Using ethernet@ff0c0000 device
+        TFTP from server 10.0.31.150; our IP address is 10.0.31.147
+        Filename 'rootfs.img'.
+        Load address: 0x2000000                      <--- ** Location in memory where rootfs.img is copied (Note this)**
+        Loading: #################################################################
+                 #################################################################
+                 #################################################################
+                 #################################################################
+                 ...
+                 ######################
+                 5.3 MiB/s
+        done
+        Bytes transferred = 524288000 (1f400000 hex) <--- ** Total size of Root file-system image in Bytes (Note this) **   
+
+
+2. Erase partition 2 and flash rootfs from memory address 0x2000000 to MMC,
 
         ZynqMP> mmc dev 0
         switch to partitions #0, OK
@@ -152,7 +161,7 @@ Following instructions provide various methods on how to program Linux kernel an
     *  0xfa000 = (size of the RootFS image) / (sector size) = (1024000 / 512) = 1024000 (decimal) = 0xfa000
 
 
-4. Update bootargs variable to select eMMC as Root device.   
+3. Update bootargs variable to select eMMC as Root device.   
 
         ZynqMP> setenv bootargs "earlycon console=ttyPS0,115200 clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait"
         ZynqMP> saveenv
@@ -160,9 +169,8 @@ Following instructions provide various methods on how to program Linux kernel an
     *  By default bootargs variable should use root=/dev/mmcblk0p2 which is eMMC partition-2 as Root file-system    
 
 
-5. Power cycle and kernel, rootfs should boot from eMMC now.
+4. Power cycle and kernel, rootfs should boot from eMMC now.  
         ZynqMP> bootm 0x1000000
     * Note: do NOT change the Switch SW1 on Othus card. The setting of the switch determines where the FSBL (u-boot) is located which is QSPI.
-
 
 
