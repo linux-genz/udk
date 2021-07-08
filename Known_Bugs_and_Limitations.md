@@ -2,10 +2,10 @@
 
 
 
-## Known limitations of release 2020.11
-- kernel crash while removing genz-linux modules. Do not rmmod linux-genz module
-- Gen-z device does not register as block device
-
+## Known limitations of 0p12
+- Genz/Genz-blk/Orthus modules do not cleanly remove after loading
+- Orthus cannot currently run as a managed entity
+- Only 1 block driver available, fabric will show as 1 block device
 
 
 [linux-genz]: https://github.com/linux-genz/linux  
