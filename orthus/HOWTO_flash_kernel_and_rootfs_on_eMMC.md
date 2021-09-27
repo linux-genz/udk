@@ -49,16 +49,14 @@ Following instructions provide various methods on how to program Linux kernel an
 
 1. Fetch kernel.img from TFTP server to kit memory at address 0x1000000 note down the addresses and # of bytes received printed at end of command   
 
-        ZynqMP> mw.b 0x1000000 0x0 0x4000000           <--- clear the memory segment where kernel.img will be copied
+        ZynqMP> mw.b 0x1000000 0x0 0x4000000           <--- clears memory region of any remant data before image is copied
 
-	ZynqMP> tftpboot 0x1000000 kernel.img
+        ZynqMP> tftpboot 0x1000000 kernel.img
         Using ethernet@ff0c0000 device
-        TFTP from server 10.0.31.150; our IP address is 10.0.31.147
+        FTP from server 10.0.31.150; our IP address is 10.0.31.147
         Filename 'kernel.img'.
-        Load address: 0x1000000                        <--- ** Location in memory where kernel.imge is copied (Note this)**
-        Loading: *#################################################################
-                 #################################################################
-                 #################################################################
+        Load address: 0x1000000                        <--- ** Make a note of this address where kernel.img will be copied **
+        Loading: #################################################################
                  #################################################################
                  ...
                  ######################
@@ -125,21 +123,21 @@ Following instructions provide various methods on how to program Linux kernel an
 
 1. Fetch Root File-system image from TFTP   
 
-        ZynqMP> mw.b 0x1000000 0x0 0x20000000          <--- clear the memory segment where rootfs.img will be copied
-        ZynqMP> tftpboot 0x2000000 rootfs.img
+        ZynqMP> mw.b 0x1000000 0x0 0x20000000           <--- clears memory region where rootfs.img will be copied
+        ZynqMP> tftpboot 0x1000000 rootfs.img
         Using ethernet@ff0c0000 device
         TFTP from server 10.0.31.150; our IP address is 10.0.31.147
         Filename 'rootfs.img'.
-        Load address: 0x2000000                      <--- ** Location in memory where rootfs.img is copied (Note this)**
+        Load address: 0x1000000                         <--- ** Make a note of this address where rootfs.img is copied (Note this)**
         Loading: #################################################################
-                 #################################################################
-                 #################################################################
                  #################################################################
                  ...
                  ######################
                  5.3 MiB/s
         done
-        Bytes transferred = 524288000 (1f400000 hex) <--- ** Total size of Root file-system image in Bytes (Note this) **   
+        Bytes transferred = 524288000 (1f400000 hex)    <--- ** Important: Make a note of Total size (in Bytes) of Root file-system. This will used for calculating number of sectors to Flash **   
+
+    * **If you get Error like "Abort: trying to write over Reserved Memory space" or something similar. Then it means that your RootFS image size is beyond the memory capacity enabled in u-boot for this device. So you may have to use other method like booting from NFS, to Flash RootFS to eMMC. TFTP will not work for very large RootFS images.**
 
 
 2. Erase partition 2 and flash rootfs from memory address 0x2000000 to MMC,
@@ -151,26 +149,25 @@ Following instructions provide various methods on how to program Linux kernel an
         ZynqMP> mmc erase 0x20800 0x400000
         MMC erase: dev # 0, block # 133120, count 4194304 ... 4194304 blocks erased: OK
 
-        ZynqMP> mmc write 0x2000000 0x20800 0xfa000
+        ZynqMP> mmc write 0x1000000 0x20800 0xfa000
         MMC write: dev # 0, block # 133120, count 1024000 ... 1024000 blocks written: OK
 
     *  Partition 2 is ~29G in size, so to save time you may erase only the space which is required. For example we erase only 2GB in above command      
     *  0x20800 = 133130 (decimal) is first sector of this Partition
     *  0x400000 = (size of partition in bytes) / (sector size) = (2 x 1024 x 1024 x 1024 / 512) = 4194304 (decimal) = 0x400000
-    *  0x2000000 = memory address where root.img was copied using TFTP    
+    *  0x1000000 = memory address where root.img was copied using TFTP    
     *  0xfa000 = (size of the RootFS image) / (sector size) = (1024000 / 512) = 1024000 (decimal) = 0xfa000
 
 
-3. Update bootargs variable to select eMMC as Root device.   
+3. Update bootargs to use eMMC Partition-2 /dev/mmcblk0p2 as Root.   
 
         ZynqMP> setenv bootargs "earlycon console=ttyPS0,115200 clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait"
         ZynqMP> saveenv
 
-    *  By default bootargs variable should use root=/dev/mmcblk0p2 which is eMMC partition-2 as Root file-system    
+4. **In current u-boot releases saveenv does not work, so you may have to manually load kernel at each power-cycle, using following command**
+    *  **ZynqMP> fatload mmc 0 0x1000000 uimage.img**
+    *  **ZynqMP> bootm 0x1000000**
 
 
-4. Power cycle and kernel, rootfs should boot from eMMC now.  
-        ZynqMP> bootm 0x1000000
-    * Note: do NOT change the Switch SW1 on Othus card. The setting of the switch determines where the FSBL (u-boot) is located which is QSPI.
-
+    * Note: **Do NOT change the Switch SW1 on Othus card. The setting of the switch determines where FPGA Boot ROM should search for First Stage Boot Loader (FLBL). FSBL is part of BOOT.bin and is flashed in QSPI. Only Linux Kernel and RootFS are in eMMC. So SW1 (boot-mode) for Orthus will still select QSPI.**
 
