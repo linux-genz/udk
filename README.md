@@ -19,8 +19,8 @@ Terminalogies
 
 
 
-[Release_Notes]: https://github.com/linux-genz/linux/udk/Release_Notes.md  
-[Known_Bugs_and_Limitations]: https://github.com/linux-genz/linux/udk/Known_Bugs_and_Limitations.md  
+[Release_Notes]: https://github.com/linux-genz/udk/blob/master/Realese_Notes.md 
+[Known_Bugs_and_Limitations]: https://github.com/linux-genz/udk/blob/master/Known_Bugs_and_Limitations.md  
 [ZMM]: https://www.smartm.com/product/advanced-memory/zmm-gen-z-memory-module 
 [Mamba]: https://www.intelliprop.com/gen-z-fabric-dram
 [250-SoC]: https://www.bittware.com/fpga/250-soc/
