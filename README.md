@@ -19,7 +19,7 @@ Terminalogies
 
 
 
-[Release_Notes]: https://github.com/linux-genz/linux/udk/Known_Bugs_and_Limitations.md  
+[Release_Notes]: https://github.com/linux-genz/linux/udk/Release_Notes.md  
 [Known_Bugs_and_Limitations]: https://github.com/linux-genz/linux/udk/Known_Bugs_and_Limitations.md  
 [ZMM]: https://www.smartm.com/product/advanced-memory/zmm-gen-z-memory-module 
 [Mamba]: https://www.intelliprop.com/gen-z-fabric-dram
