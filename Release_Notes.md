@@ -16,4 +16,4 @@
 [udk/orthus]: https://github.com/linux-genz/linux/udk/orthus 
 [Additional_Information]: https://github.com/linux-genz/udk/blob/master/Additional_Information.md  
 [README]: https://github.com/linux-genz/udk/blob/master/README.md 
-[Known_Bugs_and_Limitations]: https://github.com/linux-genz/linux/udk/Known_Bugs_and_Limitations.md  
+[Known_Bugs_and_Limitations]: https://github.com/linux-genz/udk/blob/master/Known_Bugs_and_Limitations.md   
