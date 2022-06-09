@@ -5,7 +5,7 @@ Gen-Z micro-development kit also called **uDK** (where u is symbol Mu for micro)
 Software eco-system around Gen-Z is still in development, and there are plenty of ways you can contribute to the existing infrastructure. To get started with Gen-Z micro-development kit you may start looking at [Additional_Information]. You may also start looking at [Known_Bugs_and_Limitations] to help fix limitations and known bugs.  
 
 - Instructions on how to use this kit are available in [Additional_Information] and [Release_Notes]  
-- Credentials for uDK superuser (Username: root, Password: root)
+- Credentials for uDK superuser (Username: udk, Password: genz)
 - You can also find Product Brochure and datasheets at [ZMM] website   
   
   
