@@ -17,7 +17,7 @@ Make sure to use these settings when interacting with the UART interface.
 ### Switch Location
 
 The switches are on the back of the 250 SoC near the top.
-Refer to the [README_Orthus_Hardware] for more information.
+Refer to the [Orthus_Hardware_Guide] for more information.
 
 ### Switch configurations
 
@@ -26,7 +26,7 @@ There are multiple configurations, but only the necessary ones will be listed he
 Note: For SW1.1 and SW1.4, they are shown for placement in a uDK or where the PCIe is not driving PERST and the PCIe Clock. If a host is driving them, you may need to turn these switches off.
 
 The boot mode is driven primarily by SW1.2 and SW 1.3, so make sure to take note of those below.
-Refer to the [README_Orthus_Hardware] for more information.
+Refer to the [Orthus_Hardware_Guide] for more information.
 
 #### JTAG only  
 -------------  
